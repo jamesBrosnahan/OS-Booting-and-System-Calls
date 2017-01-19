@@ -24,6 +24,28 @@
 /*                                                                        */
 /* 3460:4/526 BlackDOS kernel, Version 1.03, Spring 2017.                 */
 
+#define BLACK 0
+#define BLUE 1
+#define GREEN 2
+#define CYAN 3
+#define RED 4
+#define MAGENTA 5
+#define BROWN 6
+#define WHITE 7
+#define GRAY 8
+#define LIGHT_BLUE 9
+#define LIGHT_GREEN 10
+#define LIGHT_CYAN 11
+#define LIGHT_RED 12
+#define LIGHT_MAGENTA 13
+#define Yellow 14
+#define BRIGHT_WHITE 15
+
+#define AH 0xE
+
+#define ENTER 0xD
+#define BACKSPACE 0x8
+
 void printString(char*);
 void readString(char*);
 void clearScreen(int, int);
@@ -36,7 +58,7 @@ void main()
    int x;
    
    /* makeInterrupt21(); */
-   clearScreen(3, 12);
+   clearScreen(CYAN, LIGHT_RED);
 
    printString("___.   .__                 __       .___           \r\n\0");
    printString("\\_ |__ |  | _____    ____ |  | __ __| _/___  ______\r\n\0");
@@ -64,13 +86,11 @@ void main()
 void printString(char* c)
 {
    /* Fill this in. */
-   
-   char ah = 0xE;
    int index = 0;
    /*Does not print the NULL character (loops ends when NULL character is reached)*/
    while(c[index] != '\0'){
        /*Correctly invokes BIOS interrupt 0x10*/
-        interrupt(0x10, ah*256+c[index], 0, 0, 0);
+        interrupt(0x10, AH*256+c[index], 0, 0, 0);
         index++;
    }
    
@@ -80,28 +100,27 @@ void printString(char* c)
 void readString(char* c)
 {
    /* This too. */
-   char ah = 0xE;
    char typed_char;
    int index = 0;
    /*Reads characters into buffer until [ENTER] is pressed (loop ends when enter is pressed)*/
-   while(typed_char != 0xD){
+   while(typed_char != ENTER){
         /*Correctly invokes BIOS interrupt 0x16*/
         typed_char = interrupt(0x16, 0, 0, 0, 0);
         switch (typed_char){
             /*enter*/
-            case 0xD:
+            case ENTER:
                 /*Appends NULL terminator to buffer*/
                 c[index] = '\0';
                 /*Does not place ENTER (0x0D) into buffer*/
                 break;
             /*backspace*/
             /*Backspace key is handles correctly*/
-            case 0x8:
+            case BACKSPACE:
                 /*Cursor moves back one space*/
-                interrupt(16, ah*256+typed_char, 0, 0, 0);
+                interrupt(16, AH*256+BACKSPACE, 0, 0, 0);
                 /*Character is removed from buffer and overwritten on screen*/
-                interrupt(16, ah*256+' ', 0, 0, 0);
-                interrupt(16, ah*256+typed_char, 0, 0, 0);
+                interrupt(16, AH*256+' ', 0, 0, 0);
+                interrupt(16, AH*256+BACKSPACE, 0, 0, 0);
                 if(index > 0){
                     index--;
                 }
@@ -109,7 +128,7 @@ void readString(char* c)
             default:
                 c[index] = typed_char;
                 index++;
-                interrupt(16, ah*256+typed_char, 0, 0, 0);
+                interrupt(16, AH*256+typed_char, 0, 0, 0);
                 
         }
         
