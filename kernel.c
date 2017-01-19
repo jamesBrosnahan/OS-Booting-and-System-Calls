@@ -35,7 +35,7 @@ void main()
    int x;
    
    /* makeInterrupt21(); */
-   clearScreen(0,0);
+   //clearScreen(0,0);
 
    printString("___.   .__                 __       .___           \r\n\0");
    printString("\\_ |__ |  | _____    ____ |  | __ __| _/___  ______\r\n\0");
@@ -62,7 +62,7 @@ void main()
 void printString(char* c)
 {
    /* Fill this in. */
-   const char ah = 14;
+   char ah = 14;
    int index = 0;
    while(c[index] != '\0'){
         interrupt(16, ah*256+c[index], 0, 0, 0);
@@ -75,6 +75,7 @@ void printString(char* c)
 void readString(char* c)
 {
    /* This too. */
+   char ah = 14;
    int index = 0;
    while(c[index] != 0xD){
         c[index] = interrupt(22, 0, 0, 0, 0);
