@@ -75,11 +75,17 @@ void printString(char* c)
 void readString(char* c)
 {
    /* This too. */
-   char temp;
-   while(true){
-        temp = = interrupt(22, 0, 0, 0, 0);
-        interrupt(16, ah*256+c, 0, 0, 0);
-        
+   int index = 0;
+   while(c[index] != 0xD){
+        c[index] = interrupt(22, 0, 0, 0, 0);
+        if(c[index] = 0xD){
+            printString(c);
+        }else if(c[index] = 0x8 && index > 1){
+            index -= 2;
+        }else{
+            interrupt(16, ah*256+c, 0, 0, 0);
+            index++;
+        }
    }
    return;
 }
