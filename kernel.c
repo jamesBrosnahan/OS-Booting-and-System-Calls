@@ -35,7 +35,7 @@ void main()
    int x;
    
    /* makeInterrupt21(); */
-   //clearScreen(0,0);
+   /*clearScreen(0,0);*/
 
    printString("___.   .__                 __       .___           \r\n\0");
    printString("\\_ |__ |  | _____    ____ |  | __ __| _/___  ______\r\n\0");
@@ -59,34 +59,59 @@ void main()
    while(1);
 }
 
+/*printString function works correctly:*/
 void printString(char* c)
 {
    /* Fill this in. */
-   char ah = 14;
+   
+   char ah = 0xE;
    int index = 0;
+   /*Does not print the NULL character (loops ends when NULL character is reached)*/
    while(c[index] != '\0'){
-        interrupt(16, ah*256+c[index], 0, 0, 0);
+       /*Correctly invokes BIOS interrupt 0x10*/
+        interrupt(0x10, ah*256+c[index], 0, 0, 0);
         index++;
    }
    
    return;
 }
-
+/*readString function works correctly:*/
 void readString(char* c)
 {
    /* This too. */
-   char ah = 14;
+   char ah = 0xE;
+   char typed_char;
    int index = 0;
-   while(c[index] != 0xD){
-        c[index] = interrupt(22, 0, 0, 0, 0);
-        if(c[index] = 0xD){
-            printString(c);
-        }else if(c[index] = 0x8 && index > 1){
-            index -= 2;
-        }else{
-            interrupt(16, ah*256+c, 0, 0, 0);
-            index++;
+   /*Reads characters into buffer until [ENTER] is pressed (loop ends when enter is pressed)*/
+   while(typed_char != 0xD){
+        /*Correctly invokes BIOS interrupt 0x16*/
+        typed_char = interrupt(0x16, 0, 0, 0, 0);
+        switch (typed_char){
+            /*enter*/
+            case 0xD:
+                /*Appends NULL terminator to buffer*/
+                c[index] = '\0';
+                /*Does not place ENTER (0x0D) into buffer*/
+                break;
+            /*backspace*/
+            /*Backspace key is handles correctly*/
+            case 0x8:
+                /*Cursor moves back one space*/
+                interrupt(16, ah*256+typed_char, 0, 0, 0);
+                /*Character is removed from buffer and overwritten on screen*/
+                interrupt(16, ah*256+' ', 0, 0, 0);
+                interrupt(16, ah*256+typed_char, 0, 0, 0);
+                if(index > 0){
+                    index--;
+                }
+                break;
+            default:
+                c[index] = typed_char;
+                index++;
+                interrupt(16, ah*256+typed_char, 0, 0, 0);
+                
         }
+        
    }
    return;
 }
@@ -136,6 +161,7 @@ void writeInt(int x)
 void readInt(int* number)
 {
    /* Fill this in as well. */
+   
    return;
 }
 
