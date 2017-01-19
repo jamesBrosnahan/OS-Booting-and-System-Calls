@@ -26,6 +26,7 @@
 
 void printString(char*);
 void readString(char*);
+void clearScreen(int, int);
 void writeInt(int);
 void readInt(int*);
 
@@ -35,7 +36,7 @@ void main()
    int x;
    
    /* makeInterrupt21(); */
-   /*clearScreen(0,0);*/
+   clearScreen(3, 12);
 
    printString("___.   .__                 __       .___           \r\n\0");
    printString("\\_ |__ |  | _____    ____ |  | __ __| _/___  ______\r\n\0");
@@ -119,6 +120,17 @@ void readString(char* c)
 void clearScreen(int bx, int cx)
 {
 	/* This too. */
+	int color;
+	printString("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+	interrupt(16,512,0,0,0);
+	if(bx > 0 && cx > 0){
+	    if(cx < 17 && bx < 9){
+	        bx--;
+	        cx--;
+	        color = 4096 * bx + 256 * cx;
+	        interrupt(16, 1536, color, 0, 6223);
+	    }
+	}
 	return;
 }
 
