@@ -57,6 +57,25 @@ void main()
    char line[80];
    int x;
    
+    /* BlackDOS header */
+    printString("Enter a line: \0");
+    readString(line);
+    printString("\r\nYou typed: \0");
+    printString(line);
+    printString("\r\n\0");
+    printString("Enter a number: \0");
+    readInt(&x);
+    printString("You entered \0");
+    writeInt(x);
+    printString("\r\n\0");
+    
+    while(1);
+}
+
+void part_1_main(){
+   char line[80];
+   int x;
+   
    /* makeInterrupt21(); */
    clearScreen(CYAN, LIGHT_RED);
 
@@ -79,7 +98,6 @@ void main()
    /* printString("Your number is \0"); */
    /* writeInt(x); */
    /* printString("\r\n\0"); */
-   while(1);
 }
 
 /*printString function works correctly:*/
@@ -192,6 +210,17 @@ void writeInt(int x)
 void readInt(int* number)
 {
    /* Fill this in as well. */
+   char line[80];
+   int i;
+   readString(line);
+   (*number) = 0;
+   for( i = 0; i < 6; i++){
+        if(line[i] >= '0' && line[i] <= '9'){
+            (*number) = 10 * (*number) + line[i] - '0';
+        }else{
+            break;
+        }
+   }
    
    return;
 }
