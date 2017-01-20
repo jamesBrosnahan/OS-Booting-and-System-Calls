@@ -51,11 +51,39 @@ void readString(char*);
 void clearScreen(int, int);
 void writeInt(int);
 void readInt(int*);
+void handleInterrupt21(int, int, int, int);
+void readInt_test();
+void part_1_main();
 
 void main()
 {
    char line[80];
    int x;
+   int backgroundColor = BLACK;
+   int foregroundColor = WHITE;
+   
+    makeInterrupt21();
+    /* BlackDOS header with interrupts */
+    interrupt(33, 12, backgroundColor, foregroundColor, 0);
+    interrupt(33, 0, "Hello world\r\n\0", 0, 0);
+    interrupt(33, 0, "\r\n\0", 0, 0);
+    interrupt(33, 0, "Enter a line: \0", 0, 0);
+    interrupt(33, 1, line, 0, 0);
+    interrupt(33, 0, "You wrote: \0", 0, 0);
+    interrupt(33, 0,line,0,0);
+    interrupt(33, 0,"\r\n\0",0,0);
+    interrupt(33, 0, "Enter a number: \0", 0, 0);
+    interrupt(33, 14, &x, 0, 0);
+    interrupt(33, 0, "You entered \0", 0, 0);
+    interrupt(33, 13, x, 0, 0);
+    interrupt(33, 0, "\r\n\0", 0, 0);
+
+    while(1);
+}
+
+void readInt_test(){
+    char line[80];
+    int x;
    
     /* BlackDOS header */
     printString("Enter a line: \0");
@@ -68,8 +96,7 @@ void main()
     printString("You entered \0");
     writeInt(x);
     printString("\r\n\0");
-    
-    while(1);
+    while (1);
 }
 
 void part_1_main(){
@@ -224,5 +251,32 @@ void readInt(int* number)
    
    return;
 }
+
+void handleInterrupt21(int ax, int bx, int cx, int dx){
+    switch(ax){
+        case 0: /* ax=0, call printString(bx) */
+            printString(bx);
+            break;
+        case 1: /* ax=1, call readString(bx) */
+            readString(bx);
+            break;
+        case 12: /* ax = 12, call clearScreen(bx, cx) */
+            clearScreen(bx, cx);
+            break;
+        case 13: /* ax = 13, call writeInt(bx) */
+            writeInt(bx);
+            break;
+        case 14: /* ax = 14, call readInt(bx) */
+            readInt(bx);
+            break;
+    }
+}
+
+
+
+
+
+
+
 
 
